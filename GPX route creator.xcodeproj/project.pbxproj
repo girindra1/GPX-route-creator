@@ -10,9 +10,22 @@
 		D58DC7822F80915300A259D8 /* GPX route creator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPX route creator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D58DC7A52F84433A00A259D8 /* Exceptions for "GPX route creator" folder in "GPX route creator" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GPX-route-creator-Info.plist",
+			);
+			target = D58DC7812F80915300A259D8 /* GPX route creator */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D58DC7842F80915300A259D8 /* GPX route creator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D58DC7A52F84433A00A259D8 /* Exceptions for "GPX route creator" folder in "GPX route creator" target */,
+			);
 			path = "GPX route creator";
 			sourceTree = "<group>";
 		};
@@ -34,6 +47,9 @@
 			children = (
 				D58DC7842F80915300A259D8 /* GPX route creator */,
 				D58DC7832F80915300A259D8 /* Products */,
+				D58DC7922F81C97200A259D8 /* Models */,
+				D58DC7932F81C97200A259D8 /* Services */,
+				D58DC7942F81C97300A259D8 /* Views */,
 			);
 			sourceTree = "<group>";
 		};
@@ -43,6 +59,27 @@
 				D58DC7822F80915300A259D8 /* GPX route creator.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D58DC7922F81C97200A259D8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D58DC7932F81C97200A259D8 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D58DC7942F81C97300A259D8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,8 +288,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4RKKK56M5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GPX-route-creator-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -282,8 +321,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4RKKK56M5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GPX-route-creator-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
