@@ -8,92 +8,62 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var stationName = ""
-    @State private var selectedTrackType: TrackType = .loop
+    @State private var selectedTab: AppTab = .plan
+    @State private var parsedFiles: [ParsedGPXFile] = []
+    @State private var parsedFilesError: String?
 
-    private let routeLibrary = RouteLibrary()
-
-    private var suggestedRoutes: [GPXRoute] {
-        routeLibrary.routes(
-            near: stationName,
-            trackType: selectedTrackType
-        )
-    }
+    private let gpxLoader = GPXLoader()
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    heroSection
-                    plannerSection
-                    resultsSection
-                }
-                .padding(20)
+        TabView(selection: $selectedTab) {
+            PlanView(
+                parsedFiles: parsedFiles,
+                parsedFilesError: parsedFilesError,
+                reloadAction: loadBundledGPXFiles
+            )
+            .tabItem {
+                Label("Plan", systemImage: "map.fill")
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("GPX Route Creator")
-        }
-    }
+            .tag(AppTab.plan)
 
-    private var heroSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Plan a mountain bike ride from a train station")
-                .font(.title.bold())
-
-            Text("Enter the station you want to start from and choose whether you want a loop or one-way track. The app will suggest matching GPX-ready rides.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var plannerSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Route Inputs")
-                .font(.headline)
-
-            TextField("Train station", text: $stationName)
-                .textInputAutocapitalization(.words)
-                .autocorrectionDisabled()
-                .padding(14)
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-            Picker("Track type", selection: $selectedTrackType) {
-                ForEach(TrackType.allCases) { trackType in
-                    Text(trackType.title).tag(trackType)
-                }
+            RoutesView(
+                parsedFiles: parsedFiles,
+                parsedFilesError: parsedFilesError,
+                reloadAction: loadBundledGPXFiles
+            )
+            .tabItem {
+                Label("Routes", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
             }
-            .pickerStyle(.segmented)
+            .tag(AppTab.routes)
 
-            Text(selectedTrackType.description)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var resultsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Suggested Routes")
-                .font(.headline)
-
-            if suggestedRoutes.isEmpty {
-                ContentUnavailableView(
-                    "No matching routes yet",
-                    systemImage: "map",
-                    description: Text("Try a station like Innsbruck, Chamonix, or Finale Ligure, or add your own GPX routes to the library.")
-                )
-            } else {
-                ForEach(suggestedRoutes) { route in
-                    RouteCard(route: route)
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
                 }
+                .tag(AppTab.settings)
+        }
+        .task {
+            if parsedFiles.isEmpty && parsedFilesError == nil {
+                loadBundledGPXFiles()
             }
         }
     }
+
+    private func loadBundledGPXFiles() {
+        do {
+            parsedFiles = try gpxLoader.loadBundledFiles()
+            parsedFilesError = nil
+        } catch {
+            parsedFiles = []
+            parsedFilesError = error.localizedDescription
+        }
+    }
+}
+
+private enum AppTab {
+    case plan
+    case routes
+    case settings
 }
 
 #Preview {

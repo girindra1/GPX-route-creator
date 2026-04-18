@@ -7,15 +7,12 @@ import Foundation
 
 enum GPXParserError: LocalizedError {
     case unreadableData
-    case invalidUTF8
     case emptyTrack
 
     var errorDescription: String? {
         switch self {
         case .unreadableData:
             return "The GPX file could not be read."
-        case .invalidUTF8:
-            return "The GPX file contains invalid text data."
         case .emptyTrack:
             return "The GPX file did not contain any track points."
         }
@@ -53,6 +50,7 @@ final class GPXParser: NSObject {
 
 private final class GPXParserDelegate: NSObject, XMLParserDelegate {
     private enum ElementName: String {
+        case metadata
         case track = "trk"
         case trackName = "name"
         case segment = "trkseg"
@@ -69,9 +67,11 @@ private final class GPXParserDelegate: NSObject, XMLParserDelegate {
     private var currentPointElevation: Double?
     private var currentPointTime: Date?
     private var currentText = ""
+    private var metadataName: String?
     private var isInsideTrack = false
     private var isInsidePoint = false
     private var isInsideSegment = false
+    private var isInsideMetadata = false
 
     private lazy var dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -97,6 +97,8 @@ private final class GPXParserDelegate: NSObject, XMLParserDelegate {
         }
 
         switch element {
+        case .metadata:
+            isInsideMetadata = true
         case .track:
             isInsideTrack = true
         case .segment:
@@ -131,11 +133,15 @@ private final class GPXParserDelegate: NSObject, XMLParserDelegate {
         }
 
         switch element {
+        case .metadata:
+            isInsideMetadata = false
         case .track:
             isInsideTrack = false
         case .trackName:
             if isInsideTrack && !isInsidePoint && trackName == nil && !trimmedText.isEmpty {
                 trackName = trimmedText
+            } else if isInsideMetadata && metadataName == nil && !trimmedText.isEmpty {
+                metadataName = trimmedText
             }
         case .segment:
             if !currentSegmentPoints.isEmpty {
@@ -175,11 +181,15 @@ private final class GPXParserDelegate: NSObject, XMLParserDelegate {
     }
 
     private var normalizedTrackName: String? {
-        guard let trackName, !trackName.isEmpty else {
+        if let trackName, !trackName.isEmpty {
+            return trackName
+        }
+
+        guard let metadataName, !metadataName.isEmpty else {
             return nil
         }
 
-        return trackName
+        return metadataName
     }
 
     private func finalizedSegments() -> [GPXTrackSegment] {
@@ -191,12 +201,22 @@ private final class GPXParserDelegate: NSObject, XMLParserDelegate {
     }
 
     private func parsedDate(from text: String) -> Date? {
-        if let date = dateFormatter.date(from: text) {
+        let normalizedText = normalizedTimestamp(text)
+
+        if let date = dateFormatter.date(from: normalizedText) {
             return date
         }
 
         let fallbackFormatter = ISO8601DateFormatter()
         fallbackFormatter.formatOptions = [.withInternetDateTime]
-        return fallbackFormatter.date(from: text)
+        return fallbackFormatter.date(from: normalizedText)
+    }
+
+    private func normalizedTimestamp(_ text: String) -> String {
+        if let invalidRange = text.range(of: "Z.") {
+            return text.replacingCharacters(in: invalidRange, with: ".")
+        }
+
+        return text
     }
 }
