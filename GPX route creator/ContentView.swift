@@ -6,20 +6,26 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ContentView: View {
     @State private var selectedTab: AppTab = .plan
     @State private var parsedFiles: [ParsedGPXFile] = []
     @State private var parsedFilesError: String?
+    @State private var isLoadingParsedFiles = false
+    @State private var loadTask: Task<Void, Never>?
 
-    private let gpxLoader = GPXLoader()
+    private var isRunningInPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
 
     var body: some View {
         TabView(selection: $selectedTab) {
             PlanView(
                 parsedFiles: parsedFiles,
+                isLoadingParsedFiles: isLoadingParsedFiles,
                 parsedFilesError: parsedFilesError,
-                reloadAction: loadBundledGPXFiles
+                reloadAction: startBundledGPXFilesLoad
             )
             .tabItem {
                 Label("Plan", systemImage: "map.fill")
@@ -28,8 +34,9 @@ struct ContentView: View {
 
             RoutesView(
                 parsedFiles: parsedFiles,
+                isLoadingParsedFiles: isLoadingParsedFiles,
                 parsedFilesError: parsedFilesError,
-                reloadAction: loadBundledGPXFiles
+                reloadAction: startBundledGPXFilesLoad
             )
             .tabItem {
                 Label("Routes", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
@@ -43,19 +50,38 @@ struct ContentView: View {
                 .tag(AppTab.settings)
         }
         .task {
-            if parsedFiles.isEmpty && parsedFilesError == nil {
-                loadBundledGPXFiles()
+            if !isRunningInPreview && parsedFiles.isEmpty && parsedFilesError == nil && !isLoadingParsedFiles {
+                startBundledGPXFilesLoad()
             }
         }
     }
 
-    private func loadBundledGPXFiles() {
-        do {
-            parsedFiles = try gpxLoader.loadBundledFiles()
-            parsedFilesError = nil
-        } catch {
-            parsedFiles = []
-            parsedFilesError = error.localizedDescription
+    @MainActor
+    private func startBundledGPXFilesLoad() {
+        guard !isLoadingParsedFiles else {
+            return
+        }
+
+        loadTask?.cancel()
+        isLoadingParsedFiles = true
+        parsedFilesError = nil
+
+        loadTask = Task {
+            do {
+                let loadedFiles = try await GPXLoader().loadBundledFiles()
+
+                if !Task.isCancelled {
+                    parsedFiles = loadedFiles
+                    parsedFilesError = nil
+                    isLoadingParsedFiles = false
+                }
+            } catch {
+                if !Task.isCancelled {
+                    parsedFiles = []
+                    parsedFilesError = error.localizedDescription
+                    isLoadingParsedFiles = false
+                }
+            }
         }
     }
 }

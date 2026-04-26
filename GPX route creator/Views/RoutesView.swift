@@ -7,6 +7,7 @@ import SwiftUI
 
 struct RoutesView: View {
     let parsedFiles: [ParsedGPXFile]
+    let isLoadingParsedFiles: Bool
     let parsedFilesError: String?
     let reloadAction: () -> Void
 
@@ -22,9 +23,21 @@ struct RoutesView: View {
                             systemImage: "exclamationmark.triangle",
                             description: Text(parsedFilesError)
                         )
+                    } else if isLoadingParsedFiles {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ProgressView("Loading routes in the background...")
+
+                            Text("The route previews will appear here once parsing finishes.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     } else if parsedFiles.isEmpty {
-                        ProgressView("Loading routes...")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        ContentUnavailableView(
+                            "No routes loaded",
+                            systemImage: "map",
+                            description: Text("Reload to try loading the bundled route files again.")
+                        )
                     } else {
                         ForEach(parsedFiles) { file in
                             VStack(alignment: .leading, spacing: 12) {

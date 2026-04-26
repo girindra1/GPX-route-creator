@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D54B2E132F956636008FA575 /* TrainStationLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D54B2E102F956636008FA575 /* TrainStationLibrary.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		D54B2E102F956636008FA575 /* TrainStationLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainStationLibrary.swift; sourceTree = "<group>"; };
 		D58DC7822F80915300A259D8 /* GPX route creator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPX route creator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -64,6 +69,7 @@
 		D58DC7922F81C97200A259D8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D54B2E102F956636008FA575 /* TrainStationLibrary.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -156,6 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D54B2E132F956636008FA575 /* TrainStationLibrary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

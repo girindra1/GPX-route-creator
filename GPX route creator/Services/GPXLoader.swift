@@ -20,7 +20,17 @@ enum GPXLoaderError: LocalizedError {
 struct GPXLoader {
     private let parser = GPXParser()
 
+    func loadBundledFiles() async throws -> [ParsedGPXFile] {
+        try await Task.detached(priority: .userInitiated) {
+            try await GPXLoader().loadBundledFilesSync()
+        }.value
+    }
+
     func loadBundledFiles() throws -> [ParsedGPXFile] {
+        try loadBundledFilesSync()
+    }
+
+    private func loadBundledFilesSync() throws -> [ParsedGPXFile] {
         let urls = bundledGPXURLs()
 
         guard !urls.isEmpty else {

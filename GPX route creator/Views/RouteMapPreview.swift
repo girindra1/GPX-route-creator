@@ -27,6 +27,7 @@ struct RouteMapPreview: View {
             }
         }
         .mapStyle(.standard(elevation: .realistic))
+        .id(mapIdentity)
     }
 
     private var initialPosition: MapCameraPosition {
@@ -62,5 +63,11 @@ struct RouteMapPreview: View {
         let horizontalPadding = max(rawRect.size.width * 0.2, 2_500)
         let verticalPadding = max(rawRect.size.height * 0.2, 2_500)
         return rawRect.insetBy(dx: -horizontalPadding, dy: -verticalPadding)
+    }
+
+    private var mapIdentity: String {
+        coordinates
+            .map { "\($0.latitude),\($0.longitude)" }
+            .joined(separator: "|")
     }
 }
